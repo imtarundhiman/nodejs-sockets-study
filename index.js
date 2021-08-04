@@ -5,6 +5,9 @@ const express = require('express')
 const http = require('http')
 const app = express()
 const socketio = require('socket.io')
+// library to prevent profanity
+const Filter = require('bad-words')
+const filter = new Filter()
 
 const server = http.createServer(app)
 
@@ -30,8 +33,15 @@ io.on('connection', (socket) => {
         io.emit('countUpdated', count)
     })
 
-    socket.on('messageSend', (message) => {
+    // we can send a delivery report back to user or server by using callback as third parameter
+    socket.on('messageSend', (message, callback) => {
+
+        if(filter.isProfane(message)){
+            return callback('Please mind your language !')
+        }
+
         io.emit('readMessage', message)
+        callback()
     })
 
     socket.on('geolocationSend', (location) => {

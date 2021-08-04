@@ -35,7 +35,14 @@ document.querySelector('form').addEventListener('submit', (e) => {
         console.log('Please write a message first !')
     }
 
-    socket.emit('messageSend', message)
+    // we can get delivery report from server by using 3rd parameter
+    socket.emit('messageSend', message, (error) => {
+        if(error){
+            return console.log(error)
+        }
+
+        console.log('Message delivered!')
+    })
 })
 
 document.querySelector('#location').addEventListener('click', (e) => {
