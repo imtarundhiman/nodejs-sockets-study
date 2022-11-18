@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "local": "nodemon app.js",
     "dev": "nodemon index.js",
     "test": "jest --watchAll"
   },

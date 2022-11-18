@@ -1,0 +1,54 @@
+version: "3"
+services:
+  node-socket-image:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/node-socket
+    depends_on:
+      - socket-mongodb
+      - redis-db
+  socket-mongodb:
+    image : mongo
+    # below command will disable mongo logs
+    command: mongod --quiet --logpath /dev/null
+    environment:
+    - PUID=1000
+    - PGID=1000
+    volumes:
+    - mongodb:/data/db
+    ports:
+    - 27018:27017
+    networks:
+      - app-network
+    restart: unless-stopped
+  redis-db:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6380:6379'
+    expose:
+      - 6379
+    command: redis-server --save 20 1 --loglevel warning
+    networks:
+      - app-network
+    volumes:
+      - redis:/data
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  mongodb:
+  redis:
